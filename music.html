@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Background Music</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    #music-btn {
+      width: 50px;
+      height: 50px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+    }
+
+    #music-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+
+    #pause-icon { display: none; }
+
+    /* animasi tombol muter saat musik play */
+    .playing {
+      animation: spin 4s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <audio id="bg-music" src="music/ilysb - lany.mp3" loop></audio>
+
+  <button id="music-btn" title="Play / Pause">
+    <svg id="play-icon" class="icon" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z"/>
+    </svg>
+    <svg id="pause-icon" class="icon" viewBox="0 0 24 24">
+      <path d="M6 19h4V5H6zm8-14v14h4V5z"/>
+    </svg>
+  </button>
+
+  <script>
+    const audio = document.getElementById("bg-music");
+    const btn = document.getElementById("music-btn");
+    const playIcon = document.getElementById("play-icon");
+    const pauseIcon = document.getElementById("pause-icon");
+
+    let isPlaying = false;
+
+    function updateButton() {
+      playIcon.style.display = isPlaying ? "none" : "block";
+      pauseIcon.style.display = isPlaying ? "block" : "none";
+      btn.classList.toggle("playing", isPlaying);
+    }
+
+    btn.addEventListener("click", () => {
+      if (isPlaying) {
+        audio.pause();
+      } else {
+        audio.play().catch(() => console.log("Autoplay diblokir, klik dulu halaman utama."));
+      }
+      isPlaying = !isPlaying;
+      updateButton();
+    });
+
+    // Terima sinyal dari halaman utama
+    window.addEventListener("message", (event) => {
+      if (event.data === "startMusic" && !isPlaying) {
+        audio.play().then(() => {
+          isPlaying = true;
+          updateButton();
+        });
+      }
+    });
+
+    updateButton();
+  </script>
+</body>
+</html>
